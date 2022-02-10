@@ -50,6 +50,10 @@ if __name__ == "__main__":
         default="bert-base-uncased",
         help="Model Name or Path",
     )
+    parser.add_argument("--tokenizer_name_or_path",
+                        type=str,
+                        default="bert-base-uncased",
+                        help="Tokenizer Name or Path, if it's different than model name", )
 
     parser.add_argument("--seed", type=int, default=77, help="random seed for initialization")
     parser.add_argument("--train_batch_size", default=16, type=int, help="Batch size for training.")

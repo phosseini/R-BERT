@@ -4,7 +4,7 @@ import random
 
 import numpy as np
 import torch
-from transformers import BertTokenizer
+from transformers import AutoTokenizer
 
 from official_eval import official_f1
 
@@ -16,7 +16,10 @@ def get_label(args):
 
 
 def load_tokenizer(args):
-    tokenizer = BertTokenizer.from_pretrained(args.model_name_or_path)
+    if args.tokenizer_name_or_path:
+        tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_name_or_path)
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
     tokenizer.add_special_tokens({"additional_special_tokens": ADDITIONAL_SPECIAL_TOKENS})
     return tokenizer
 
