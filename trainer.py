@@ -6,6 +6,7 @@ import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from tqdm import tqdm, trange
 from transformers import AdamW, BertConfig, get_linear_schedule_with_warmup
+from sklearn.metrics import classification_report
 
 from model import RBERT
 from utils import compute_metrics, get_label, write_prediction
@@ -47,7 +48,7 @@ class Trainer(object):
         if self.args.max_steps > 0:
             t_total = self.args.max_steps
             self.args.num_train_epochs = (
-                self.args.max_steps // (len(train_dataloader) // self.args.gradient_accumulation_steps) + 1
+                    self.args.max_steps // (len(train_dataloader) // self.args.gradient_accumulation_steps) + 1
             )
         else:
             t_total = len(train_dataloader) // self.args.gradient_accumulation_steps * self.args.num_train_epochs
@@ -189,8 +190,12 @@ class Trainer(object):
         preds = np.argmax(preds, axis=1)
         write_prediction(self.args, os.path.join(self.args.eval_dir, "proposed_answers.txt"), preds)
 
-        result = compute_metrics(preds, out_label_ids)
-        results.update(result)
+        if self.args.official_eval:
+            result = compute_metrics(preds, out_label_ids)
+            results.update(result)
+        else:
+            print('***** Classification report *****')
+            print(classification_report(out_label_ids, preds))
 
         logger.info("***** Eval results *****")
         for key in sorted(results.keys()):
